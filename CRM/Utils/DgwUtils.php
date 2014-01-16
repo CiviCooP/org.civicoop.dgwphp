@@ -684,7 +684,7 @@ class CRM_Utils_DgwUtils {
                         $executeInsert = true;
                     }
                     if ( isset( $hoofdAddress['city'] ) ) {
-                        $city = CRM_Core_DAO::escapeString($city);
+                        $city = CRM_Core_DAO::escapeString($hoofdAddress['city']);
                         $insArray[] = "city = '$city'";
                         $executeInsert = true;
                     }
