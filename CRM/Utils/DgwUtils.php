@@ -1130,7 +1130,7 @@ class CRM_Utils_DgwUtils {
         return false;
     }
     /**
-     * static function to convert string (format dd-mm-jj) to date
+     * static function to convert string (format dd-mm-jjjj) to date
      * @author Erik Hommel (erik.hommel@civicoop.org)
      * @param $inDate string
      * @return $outDate string
@@ -1212,5 +1212,33 @@ class CRM_Utils_DgwUtils {
             }
         }
         return $result;
+    }
+    /**
+     * Function to retrieve the persoonsnummer first for a contact
+     * 
+     * @author Erik Hommel (erik.hommel@civicoop.org)
+     * @date 28 Jan 2014
+     * @param int $contact_id
+     * @return int $persoon_first
+     * @access public
+     * @static
+     */
+    public static function getPersoonsnummerFirst($contact_id) {
+        $persoon_first = 0;
+        /*
+         * contact_id can not be empty and has to be numeric
+         */
+        if (empty($contact_id) || !is_numeric($contact_id)) {
+            exit();
+            return $persoon_first;
+        }
+        /*
+         * retrieve using api
+         */
+        $contact = civicrm_api3('DgwContact', 'Get', array('contact_id' => $contact_id));
+        if (isset($contact[1]['Persoonsnummer_First'])) {
+            $persoon_first = $contact[1]['Persoonsnummer_First'];
+        }
+        return $persoon_first;
     }
 }
