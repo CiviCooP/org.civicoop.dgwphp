@@ -1142,10 +1142,75 @@ class CRM_Utils_DgwUtils {
         }
         $day = substr($inDate,0,2);
         $month = substr($inDate,3,2);
-        $year = substr($inDate,6,2);
+        $year = substr($inDate,6,4);
         $processedDate = $year."-".$month."-".$day." 00:00:00";
         $tempDate = new DateTime($processedDate);
         $outDate = $tempDate->format("Ymd");
         return $outDate;
+    }
+    /**
+     * function to retrieve a houshouden id for a hoofdhuurder
+     * 
+     * @author Erik Hommel (erik.hommel@civicoop.org)
+     * @date 27 Jan 2014
+     * @param int $hoofdhuurder_id
+     * @return int $huishouden_id
+     * @access public
+     * @static
+     */
+    public static function getHuishoudenHoofdhuurder($hoofdhuurder_id) {
+        $huishouden_id = 0;
+        $hoofdhuurder_label = self::getDgwConfigValue('relatie hoofdhuurder');
+        try {
+            $rel_type = civicrm_api3('RelationshipType', 'Getsingle', array('label_a_b' => $hoofdhuurder_label));
+            $rel_type_id = $rel_type['id'];
+        } catch(CiviCRM_API3_Exception $e) {
+            return $huishouden_id;
+        }
+        $params = array(
+            'relationship_type_id'  =>  $rel_type_id,
+            'is_active'             =>  1,
+            'contact_id_a'          =>  $hoofdhuurder_id  
+        );
+        try {
+            $relations = civicrm_api3('Relationship', 'Getsingle', $params);
+            return $relations['contact_id_b'];
+        } catch(CiviCRM_API3_Exception $e) {
+            return $huishouden_id;
+        }
+    }
+    /**
+     * function to glue formatted address
+     * 
+     * @author Erik Hommel (erik.hommel@civicoop.org)
+     * @date 27 Jan 2014
+     * @param array $params
+     * @return string $result
+     * @access public
+     * @static
+     */
+    public static function formatVgeAdres($params) {
+        $formatted_address = array();
+        if (isset($params['street_name']) && !empty($params['street_name'])) {
+            $formatted_address[] = $params['street_name'];
+        }
+        if (isset($params['street_number']) && !empty($params['street_number'])) {
+            $formatted_address[] = $params['street_number'];
+        }
+        if (isset($params['street_unit']) && !empty($params['street_unit'])) {
+            $formatted_address = $params['street_unit'];
+        }
+        $result = implode(" ", $formatted_address);
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $result .= ", ".$params['postal_code'];
+            if (isset($params['city']) && !empty($params['city'])) {
+                $result .= " ".$params['city'];
+            }
+        } else {
+            if (isset($params['city']) && !empty($params['city'])) {
+                $result .= ", ".$params['city'];
+            }
+        }
+        return $result;
     }
 }
