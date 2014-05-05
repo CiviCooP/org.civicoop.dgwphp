@@ -1241,4 +1241,71 @@ class CRM_Utils_DgwUtils {
         }
         return $persoon_first;
     }
+    /**
+     * Function to retrieve hoofdhuurder(s) of Huishouden
+     * Is $active is true, only the active one is returned else
+     * all
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 25 Apr 2014
+     * @param int $huishoudenId
+     * @param boolean $active
+     * @return array $hoofdHuurders id, start_date, end_date
+     */
+    public static function getHoofdhuurders($huishoudenId, $active = true) {
+      $hoofdHuurders = array();
+      $relTypeParams = array('name_a_b' => 'Hoofdhuurder', 'return' => 'id');
+      $relTypeId = civicrm_api3('RelationshipType', 'Getvalue', $relTypeParams);
+      $hoofdHuurderParams = array('relationship_type_id' => $relTypeId, 'contact_id_b' => $huishoudenId);
+      if ($active == true) {
+        $hoofdHuurderParams['is_active'] = 1;
+      }
+      $apiHoofdHuurders = civicrm_api3('Relationship', 'Get', $hoofdHuurderParams);
+      foreach($apiHoofdHuurders['values'] as $apiHoofdHuurder) {
+        $hoofdHuurder = array();
+        $hoofdHuurder['contact_id'] = $apiHoofdHuurder['contact_id_a'];
+        if (isset($apiHoofdHuurder['start_date'])) {
+          $hoofdHuurder['start_date'] = $apiHoofdHuurder['start_date'];
+        }
+        if (isset($apiHoofdHuurder['end_date'])) {
+          $hoofdHuurder['end_date'] = $apiHoofdHuurder['end_date'];
+        }
+        $hoofdHuurders[] = $hoofdHuurder;
+      }
+      return $hoofdHuurders;
+    }
+    /**
+     * Function to retrieve koopovereenkomst partner(s) of Huishouden
+     * Is $active is true, only the active one is returned else
+     * all
+     * 
+     * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+     * @date 29 Apr 2014
+     * @param int $huishoudenId
+     * @param boolean $active
+     * @return array $koopPartners id, start_date, end_date
+     */
+    public static function getKooppartners($huishoudenId, $active = true) {
+      $koopPartners = array();
+      $relTypeParams = array('name_a_b' => 'Koopovereenkomst partner', 'return' => 'id');
+      $relTypeId = civicrm_api3('RelationshipType', 'Getvalue', $relTypeParams);
+      $koopPartnerParams = array('relationship_type_id' => $relTypeId, 'contact_id_b' => $huishoudenId);
+      if ($active == true) {
+        $koopPartnerParams['is_active'] = 1;
+      }
+      $apiKoopPartners = civicrm_api3('Relationship', 'Get', $koopPartnerParams);
+      foreach($apiKoopPartners['values'] as $apiKoopPartner) {
+        $koopPartner = array();
+        $koopPartner['contact_id'] = $apiKoopPartner['contact_id_a'];
+        if (isset($apiKoopPartner['start_date'])) {
+          $koopPartner['start_date'] = $apiKoopPartner['start_date'];
+        }
+        if (isset($apiKoopPartner['end_date'])) {
+          $koopPartner['end_date'] = $apiKoopPartner['end_date'];
+        }
+        $koopPartners[] = $koopPartner;
+      }
+      return $koopPartners;
+    }
 }
+
