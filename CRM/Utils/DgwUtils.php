@@ -1307,5 +1307,53 @@ class CRM_Utils_DgwUtils {
       }
       return $koopPartners;
     }
+  /**
+   * Function to retrieve huurovereenkomsten for huishouden
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 12 May 2014
+   * @param int $huishoudenId
+   * @return array $result
+   * @access public
+   * @static
+   */  
+  public static function getVgeHuurovereenkomst($huishoudenId) {
+    $result = array();
+    if (empty($huishoudenId)) {
+      return $result;
+    }
+    $hovTabelName = self::getDgwConfigValue('tabel huurovereenkomst huishouden');
+    $hovCustomTableName = self::getCustomGroupTableName($hovTabelName);
+    if (empty($hovCustomTableName)) {
+      return $result;
+    } else {
+      $vgeHovQry = 'SELECT * FROM '.$hovCustomTableName.' WHERE entity_id = %1';
+      $vgeHovParams = array(1=>array($huishoudenId, 'Integer'));
+      $daoHov = CRM_Core_DAO::executeQuery($vgeHovQry, $vgeHovParams);
+      while ($daoHov->fetch()) {
+        $result[$daoHov->id] = self::constructDaoArray($daoHov);
+      }
+      return $result;
+    }
+  }
+  /**
+   * Function to construct return array for dao
+   * 
+   * @author Erik Hommel (CiviCooP) <erik.hommel@civicoop.org>
+   * @date 12 May 2014
+   * @param object $dao
+   * @return array $result
+   * @access private
+   * @static
+   */
+  private static function constructDaoArray($dao) {
+    $result = array();
+    $daoFields = get_object_vars($dao);
+    foreach ($daoFields as $fieldName => $fieldValue) {
+      if (substr($fieldName, 0, 1) != "_" && $fieldName != "N") {
+        $result[$fieldName] = $fieldValue;
+      }
+    }
+    return $result;
+  }
 }
-
