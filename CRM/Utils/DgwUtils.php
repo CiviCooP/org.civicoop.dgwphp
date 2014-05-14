@@ -1323,17 +1323,37 @@ class CRM_Utils_DgwUtils {
       return $result;
     }
     $hovTabelName = self::getDgwConfigValue('tabel huurovereenkomst huishouden');
-    $hovCustomTableName = self::getCustomGroupTableName($hovTabelName);
-    if (empty($hovCustomTableName)) {
+    $hovCustomTable = civicrm_api3('CustomGroup', 'Getsingle', array('name' => $hovTabelName));
+    if (empty($hovCustomTable)) {
       return $result;
     } else {
-      $vgeHovQry = 'SELECT * FROM '.$hovCustomTableName.' WHERE entity_id = %1';
+      $columnNameParams = array(
+        'custom_group_id' => $hovCustomGroup['id'],
+        'name' => 'Einddatum_HOV',
+        'return' => 'column_name');
+      $hovEndDateColumn = civicrm_api3('CustomField', 'Getvalue', $columnNameParams);
+      CRM_Core_Error::debug("column end date", $hovEndDateColumn);
+      /*
+       * first get the ones without end date
+       */
+      $vgeHovActiveQry = 'SELECT * FROM '.$hovCustomTable['table_name'].
+        ' WHERE entity_id = %1 AND '.$hovEndDateColumn.' = ""';
+      $vgeHovActiveParams = array(1=>array($huishoudenId, 'Integer'));
+      $daoHovActive = CRM_Core_DAO::executeQuery($vgeHovActiveQry, $vgeHovActiveParams);
+      while ($daoHovActive->fetch()) {
+        $result[$daoHovActive->id] = self::constructDaoArray($daoHovActive);
+      }
+      /*
+       * now add the rest in end_date descending order
+       */
+      $vgeHovQry = 'SELECT * FROM '.$hovCustomTable['table_name'].' WHERE entity_id = %1 AND '
+        .$hovEndDateColumn.' != "" ORDER BY '.$hovEndDateColumn;
       $vgeHovParams = array(1=>array($huishoudenId, 'Integer'));
       $daoHov = CRM_Core_DAO::executeQuery($vgeHovQry, $vgeHovParams);
       while ($daoHov->fetch()) {
         $result[$daoHov->id] = self::constructDaoArray($daoHov);
       }
-      return $result;
+return $result;
     }
   }
   /**
