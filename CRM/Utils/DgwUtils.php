@@ -1332,7 +1332,6 @@ class CRM_Utils_DgwUtils {
         'name' => 'Einddatum_HOV',
         'return' => 'column_name');
       $hovEndDateColumn = civicrm_api3('CustomField', 'Getvalue', $columnNameParams);
-      CRM_Core_Error::debug("column end date", $hovEndDateColumn);
       /*
        * first get the ones without end date
        */
