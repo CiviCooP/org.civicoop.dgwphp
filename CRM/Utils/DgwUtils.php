@@ -1336,7 +1336,7 @@ class CRM_Utils_DgwUtils {
        * first get the ones without end date
        */
       $vgeHovActiveQry = 'SELECT * FROM '.$hovCustomTable['table_name'].
-        ' WHERE entity_id = %1 AND '.$hovEndDateColumn.' = ""';
+        ' WHERE entity_id = %1 AND ('.$hovEndDateColumn.' = "" OR '.$hovEndDateColumn.' IS NULL)';
       $vgeHovActiveParams = array(1=>array($huishoudenId, 'Integer'));
       $daoHovActive = CRM_Core_DAO::executeQuery($vgeHovActiveQry, $vgeHovActiveParams);
       while ($daoHovActive->fetch()) {
