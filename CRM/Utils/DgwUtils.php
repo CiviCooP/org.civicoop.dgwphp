@@ -477,6 +477,36 @@ class CRM_Utils_DgwUtils {
         return $hoofdHuurder;
     }
     /**
+     * static function to check if contact is medehuurder
+     * @author Erik Hommel (erik.hommel@civicoop.org)
+     * @param $contactId
+     * @return $hoofdHuuder boolean
+     */
+    static function checkContactMedehuurder( $contactId ) {
+        $medeHuurder = false;
+        if ( empty( $contactId ) ) {
+            return $medeHuurder;
+        }
+        $relMedeHuurder = self::getDgwConfigValue( 'relatie medehuurder' );
+        $relTypeParams = array(
+            'version'   =>  3,
+            'label_a_b' =>  $relMedeHuurder
+        );
+        $relType = civicrm_api( 'RelationshipType', 'Getsingle' , $relTypeParams );
+        if ( !isset( $relType['is_error'] ) || $relType['is_error'] == 0 ) {
+            $relParams = array(
+                'version'               =>  3,
+                'relationship_type_id'  =>  $relType['id'],
+                'contact_id_a'          =>  $contactId
+            );
+            $rel = civicrm_api( 'Relationship', 'Getsingle', $relParams );
+            if ( !isset( $rel['is_error'] ) || $rel['is_error'] == 0 ) {
+                $medeHuurder = true;
+            }
+        }
+        return $medeHuurder;
+    }
+    /**
      * static function to retrieve contactId of medehuurder for contact
      * @author Erik Hommel (erik.hommel@civicoop.org)
      * @param $huisHoudenId contact_id of huishouden
