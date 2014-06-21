@@ -452,7 +452,7 @@ class CRM_Utils_DgwUtils {
      * @param $contactId
      * @return $hoofdHuuder boolean
      */
-    static function checkContactHoofdhuurder( $contactId ) {
+    static function checkContactHoofdhuurder( $contactId, $onlyActive = FALSE ) {
         $hoofdHuurder = false;
         if ( empty( $contactId ) ) {
             return $hoofdHuurder;
@@ -469,6 +469,9 @@ class CRM_Utils_DgwUtils {
                 'relationship_type_id'  =>  $relType['id'],
                 'contact_id_a'          =>  $contactId
             );
+            if ($onlyActive == TRUE) {
+              $relParams['is_active'] = 1;
+            }
             $rel = civicrm_api( 'Relationship', 'Getsingle', $relParams );
             if ( !isset( $rel['is_error'] ) || $rel['is_error'] == 0 ) {
                 $hoofdHuurder = true;
@@ -482,7 +485,7 @@ class CRM_Utils_DgwUtils {
      * @param $contactId
      * @return $hoofdHuuder boolean
      */
-    static function checkContactMedehuurder( $contactId ) {
+    static function checkContactMedehuurder( $contactId, $onlyActive = FALSE ) {
         $medeHuurder = false;
         if ( empty( $contactId ) ) {
             return $medeHuurder;
@@ -499,6 +502,9 @@ class CRM_Utils_DgwUtils {
                 'relationship_type_id'  =>  $relType['id'],
                 'contact_id_a'          =>  $contactId
             );
+            if ($onlyActive == TRUE) {
+              $relParams['is_active'] = 1;
+            }
             $rel = civicrm_api( 'Relationship', 'Getsingle', $relParams );
             if ( !isset( $rel['is_error'] ) || $rel['is_error'] == 0 ) {
                 $medeHuurder = true;
