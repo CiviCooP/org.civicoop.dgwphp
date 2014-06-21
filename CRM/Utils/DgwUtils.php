@@ -1296,6 +1296,7 @@ class CRM_Utils_DgwUtils {
       if ($active == true) {
         $hoofdHuurderParams['is_active'] = 1;
       }
+      
       $apiHoofdHuurders = civicrm_api3('Relationship', 'Get', $hoofdHuurderParams);
       foreach($apiHoofdHuurders['values'] as $apiHoofdHuurder) {
         $hoofdHuurder = array();
@@ -1308,8 +1309,10 @@ class CRM_Utils_DgwUtils {
         }
         $hoofdHuurders[] = $hoofdHuurder;
       }
+      
       return $hoofdHuurders;
-    }
+    }   
+    
     /**
      * Function to retrieve koopovereenkomst partner(s) of Huishouden
      * Is $active is true, only the active one is returned else
@@ -1364,7 +1367,7 @@ class CRM_Utils_DgwUtils {
       return $result;
     } else {
       $columnNameParams = array(
-        'custom_group_id' => $hovCustomGroup['id'],
+        'custom_group_id' => $hovCustomTable['id'],
         'name' => 'Einddatum_HOV',
         'return' => 'column_name');
       $hovEndDateColumn = civicrm_api3('CustomField', 'Getvalue', $columnNameParams);
