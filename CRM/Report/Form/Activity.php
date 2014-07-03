@@ -350,6 +350,16 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
     
     /**
+      * Show J or N is there is a attachment
+      * 
+      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
+      * @date 03 Juli 2014
+      * 
+      * @todo Set column header
+      */
+    $this->_columnHeaders['attachment'] = array('title' => ts('Attachments'));
+    
+    /**
       * Add a edit link to the activity
       * 
       * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
@@ -403,7 +413,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             LEFT JOIN civicrm_email civicrm_email_assignee
                    ON {$this->_aliases['civicrm_activity_assignment']}.assignee_contact_id = civicrm_email_assignee.contact_id AND
                       civicrm_email_assignee.is_primary = 1 ";
-    }
+    }   
+    
     $this->addAddressFromClause();
   }
 
@@ -655,6 +666,27 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         }
       }
       
+      /**
+      * Show J or N is there is a attachment
+      * 
+      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
+      * @date 03 Juli 2014
+      * 
+      * @todo Set field
+      */
+      if(!empty($rows[$rowNum]['civicrm_activity_id'])){
+        $sql = "SELECT file_id FROM civicrm_entity_file WHERE entity_table = 'civicrm_activity' AND entity_id = '" . $rows[$rowNum]['civicrm_activity_id'] . "' LIMIT 1";
+        $dao = CRM_Core_DAO::executeQuery($sql);
+        $dao->fetch();
+        
+        // if exists J else N
+        if($dao->N){
+          $rows[$rowNum]['attachment'] = 'J';
+        }else {
+          $rows[$rowNum]['attachment'] = 'N';
+        }
+      } 
+          
       /**
         * Add a edit link to the activity
         * 
