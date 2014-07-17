@@ -157,6 +157,27 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
         ),
       ),
+      /**
+      * Show phone number of contact
+      * 
+      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
+      * @date 17 Juli 2014
+      * 
+      * @todo set column contact phone
+      */
+      'civicrm_phone' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' =>
+        array(
+          'phone' =>
+          array(
+            'name' => 'phone',
+            'title' => ts('Contact Phone'),
+            'alias' => 'civicrm_phone',
+          ),
+        ),
+      ),
       'civicrm_activity' =>
       array(
         'dao' => 'CRM_Activity_DAO_Activity',
@@ -348,17 +369,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         }
       }
     }
-    
-    /**
-      * Show J or N is there is a attachment
-      * 
-      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
-      * @date 03 Juli 2014
-      * 
-      * @todo Set column header
-      */
-    $this->_columnHeaders['attachment'] = array('title' => ts('Attachments'));
-    
+        
     /**
       * Add a edit link to the activity
       * 
@@ -387,7 +398,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                     ON {$this->_aliases['civicrm_activity_target']}.target_contact_id = contact_civireport.id
              LEFT JOIN civicrm_contact civicrm_contact_assignee
                     ON {$this->_aliases['civicrm_activity_assignment']}.assignee_contact_id = civicrm_contact_assignee.id
-
+             
              {$this->_aclFrom}
              LEFT JOIN civicrm_option_value
                     ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
@@ -414,6 +425,21 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                    ON {$this->_aliases['civicrm_activity_assignment']}.assignee_contact_id = civicrm_email_assignee.contact_id AND
                       civicrm_email_assignee.is_primary = 1 ";
     }   
+    
+    /**
+      * Show phone number of contact
+      * 
+      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
+      * @date 17 Juli 2014
+      * 
+      * @todo left join phone if exists
+      */
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_phone
+                   ON contact_civireport.id = civicrm_phone.contact_id AND
+                      civicrm_phone.is_primary = 1 ";
+    } 
     
     $this->addAddressFromClause();
   }
@@ -665,28 +691,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
-      
-      /**
-      * Show J or N is there is a attachment
-      * 
-      * @author Jan-Derek Vos (Bosqom) <j.vos@bosqom.nl>
-      * @date 03 Juli 2014
-      * 
-      * @todo Set field
-      */
-      if(!empty($rows[$rowNum]['civicrm_activity_id'])){
-        $sql = "SELECT file_id FROM civicrm_entity_file WHERE entity_table = 'civicrm_activity' AND entity_id = '" . $rows[$rowNum]['civicrm_activity_id'] . "' LIMIT 1";
-        $dao = CRM_Core_DAO::executeQuery($sql);
-        $dao->fetch();
-        
-        // if exists J else N
-        if($dao->N){
-          $rows[$rowNum]['attachment'] = 'J';
-        }else {
-          $rows[$rowNum]['attachment'] = 'N';
-        }
-      } 
-          
+                
       /**
         * Add a edit link to the activity
         * 
