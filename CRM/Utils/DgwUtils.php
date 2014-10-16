@@ -68,6 +68,23 @@ class CRM_Utils_DgwUtils {
         $result = $customField;
         return $result;
     }
+    
+    static function getCustomFieldByName($name){
+      $params = array(
+        'version' => 3,
+        'sequential' => 1,
+        'name' => $name,
+      );
+      $result = civicrm_api('CustomField', 'getsingle', $params);
+      
+      if($result['is_error']){
+        return array();
+      }else {
+        return $result;
+      }
+    }
+    
+    
     /**
      * Static function to glue street_address in NL_nl format from components
      * (street_name, street_number, street_unit)
