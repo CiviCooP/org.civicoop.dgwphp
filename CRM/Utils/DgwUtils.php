@@ -1234,7 +1234,7 @@ class CRM_Utils_DgwUtils {
             $formatted_address[] = $params['street_number'];
         }
         if (isset($params['street_unit']) && !empty($params['street_unit'])) {
-            $formatted_address = $params['street_unit'];
+            $formatted_address[] = $params['street_unit'];
         }
         $result = implode(" ", $formatted_address);
         if (isset($params['postal_code']) && !empty($params['postal_code'])) {
