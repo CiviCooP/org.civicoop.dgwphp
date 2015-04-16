@@ -1266,34 +1266,38 @@ class CRM_Utils_DgwUtils {
         }
         return $result;
     }
-    /**
-     * Function to retrieve the persoonsnummer first for a contact
-     * 
-     * @author Erik Hommel (erik.hommel@civicoop.org)
-     * @date 28 Jan 2014
-     * @param int $contact_id
-     * @return int $persoon_first
-     * @access public
-     * @static
-     */
-    public static function getPersoonsnummerFirst($contact_id) {
-        $persoon_first = 0;
-        /*
-         * contact_id can not be empty and has to be numeric
-         */
-        if (empty($contact_id) || !is_numeric($contact_id)) {
-            exit();
-            return $persoon_first;
-        }
-        /*
-         * retrieve using api
-         */
-        $contact = civicrm_api3('DgwContact', 'Get', array('contact_id' => $contact_id));
-        if (isset($contact[1]['Persoonsnummer_First'])) {
-            $persoon_first = $contact[1]['Persoonsnummer_First'];
-        }
-        return $persoon_first;
+  /**
+   * Function to retrieve the persoonsnummer first for a contact
+   *
+   * BOS1502861 - take Organisation into consideration
+   *
+   * @author Erik Hommel (erik.hommel@civicoop.org)
+   * @date 28 Jan 2014
+   * @param int $contactId
+   * @return int $persoonFirst
+   * @access public
+   * @static
+   */
+  public static function getPersoonsnummerFirst($contactId) {
+    $persoonFirst = 0;
+    if (empty($contactId) || !is_numeric($contactId)) {
+      return $persoonFirst;
     }
+    $contact = civicrm_api3('DgwContact', 'Get', array('contact_id' => $contactId));
+    switch ($contact[1]['contact_type']) {
+      case 'Organization':
+        if (isset($contact[1]['Nr_in_First'])) {
+          $persoonFirst = $contact[1]['Nr_in_First'];
+        }
+        break;
+      case 'Individual':
+        if (isset($contact[1]['Persoonsnummer_First'])) {
+          $persoonFirst = $contact[1]['Persoonsnummer_First'];
+        }
+        break;
+    }
+    return $persoonFirst;
+  }
     /**
      * Function to retrieve hoofdhuurder(s) of Huishouden
      * Is $active is true, only the active one is returned else
