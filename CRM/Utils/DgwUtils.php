@@ -469,7 +469,7 @@ class CRM_Utils_DgwUtils {
      * @param $contactId
      * @return $hoofdHuuder boolean
      */
-    static function checkContactHoofdhuurder( $contactId, $onlyActive = FALSE ) {
+    static function checkContactHoofdhuurder( $contactId, $onlyActive = FALSE, $onlyOne = FALSE ) {
         $hoofdHuurder = false;
         if ( empty( $contactId ) ) {
             return $hoofdHuurder;
@@ -489,6 +489,20 @@ class CRM_Utils_DgwUtils {
             if ($onlyActive == TRUE) {
               $relParams['is_active'] = 1;
             }
+            
+            /**
+             * BOSW1508088 insite - geen vge in weekoverzicht dossierrapporten
+             * Fix by Jan-Derek Vos CiviCooP
+             * This ensures that only one result will be returned, if there are 
+             * more than one hoofdhuurder
+             */
+            if($onlyOne == TRUE){
+              $relParams['options'] = array(
+                'sort' => 'start_date DESC',
+                'limit' => 1,
+              );
+            }
+            
             $rel = civicrm_api( 'Relationship', 'Getsingle', $relParams );
             if ( !isset( $rel['is_error'] ) || $rel['is_error'] == 0 ) {
                 $hoofdHuurder = true;
