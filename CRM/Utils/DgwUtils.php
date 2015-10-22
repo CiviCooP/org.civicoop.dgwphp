@@ -1233,6 +1233,38 @@ class CRM_Utils_DgwUtils {
         }
     }
     /**
+     * function to retrieve a houshouden id for a medehuurder
+     *
+     * @author Erik Hommel (erik.hommel@civicoop.org)
+     * @date 27 Jan 2014
+     * @param int $medehuurder_id
+     * @return int $huishouden_id
+     * @access public
+     * @static
+     */
+    public static function getHuishoudenMedehuurder($medehuurder_id) {
+        $huishouden_id = 0;
+        $medehuurder_label = self::getDgwConfigValue('relatie medehuurder');
+        try {
+            $rel_type = civicrm_api3('RelationshipType', 'Getsingle', array('label_a_b' => $medehuurder_label));
+            $rel_type_id = $rel_type['id'];
+        } catch (CiviCRM_API3_Exception $e) {
+            return $huishouden_id;
+        }
+        $params = array(
+          'relationship_type_id' => $rel_type_id,
+          'is_active' => 1,
+          'contact_id_a' => $medehuurder_id
+        );
+        try {
+            $relations = civicrm_api3('Relationship', 'Getsingle', $params);
+            return $relations['contact_id_b'];
+        } catch (CiviCRM_API3_Exception $e) {
+            return $huishouden_id;
+        }
+    }
+
+    /**
      * function to glue formatted address
      * 
      * @author Erik Hommel (erik.hommel@civicoop.org)
