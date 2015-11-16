@@ -1344,6 +1344,40 @@ class CRM_Utils_DgwUtils {
     }
     return $persoonFirst;
   }
+    
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * 
+     * @param type $fields (params for the api)
+     * @param type $get (get, getsingle, enz...)
+     * @return type
+     * @throws Exception
+     */
+    public static function getContact($fields = [], $get = 'getsingle'){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+        );
+        foreach($fields as $field => $value){
+          $params[$field] = $value;
+        }
+
+        $result = civicrm_api('Contact', $get, $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::getContact, API Contact ' . $get . ' is_error, ' . $result['error_message']);
+          return false;
+        }
+        return $result;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::getContact, API Contact ' . $get . ' catch, '.$ex->getMessage());
+        return false;
+      }
+
+      return false;
+    }
+  
     /**
      * Function to retrieve hoofdhuurder(s) of Huishouden
      * Is $active is true, only the active one is returned else
