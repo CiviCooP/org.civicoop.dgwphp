@@ -84,6 +84,38 @@ class CRM_Utils_DgwUtils {
       }
     }
     
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * Get all custom field that belongs to a custom group
+     * 
+     * @param type $fields
+     * @return boolean
+     * @throws Exception
+     */
+    public static function getCustomFieldAll($fields){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+        );
+        foreach($fields as $field => $value){
+          $params[$field] = $value;
+        }
+
+        $result = civicrm_api('CustomField', 'get', $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::getCustomFieldAll, API CustomField get is_error, ' . $result['error_message']);
+          return false;
+        }
+        return $result;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::getCustomFieldAll, API CustomField get catch, '.$ex->getMessage());
+        return false;
+      }
+      return false;
+    }
+    
     
     /**
      * Static function to glue street_address in NL_nl format from components
@@ -434,6 +466,39 @@ class CRM_Utils_DgwUtils {
         }
         return $value;
     }
+    
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * 
+     * @param type $fields (params for the api)
+     * @param type $get (get, getsingle, enz..)
+     * @return type
+     * @throws Exception
+     */
+    public static function getCustomGroup($fields = [], $get = 'getsingle'){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+        );
+        foreach($fields as $field => $value){
+          $params[$field] = $value;
+        }
+        
+        $result = civicrm_api('CustomGroup', $get, $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::getCustomGroup, API CustomGroup ' . $get . ' is_error, ' . $result['error_message']);
+          return false;
+        }
+        return $result;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::getCustomGroup, API CustomGroup ' . $get . ' catch, '.$ex->getMessage());
+        return false;
+      }
+      return false;
+    }
+    
     /**
      * function to retrieve custom group table name with custom group title
      * @author Erik Hommel (erik.hommel@civicoop.org)
@@ -463,6 +528,40 @@ class CRM_Utils_DgwUtils {
         }
         return $tableName;
     }
+    
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * 
+     * @param type $fields (params for the api)
+     * @param type $get (get, getsingle, enz...)
+     * @return type
+     * @throws Exception
+     */
+    public static function getLocationType($fields = [], $get = 'getsingle'){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+        );
+        foreach($fields as $field => $value){
+          $params[$field] = $value;
+        }
+
+        $result = civicrm_api('LocationType', $get, $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::getLocationType, API LocationType ' . $get . ' is_error, ' . $result['error_message']);
+          return false;
+        }
+        return $result;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::getLocationType, API LocationType ' . $get . ' catch, '.$ex->getMessage());
+        return false;
+      }
+
+      return false;
+    }
+    
     /**
      * static function to check if contact is hoofdhuurder
      * @author Erik Hommel (erik.hommel@civicoop.org)
@@ -1376,6 +1475,64 @@ class CRM_Utils_DgwUtils {
       }
 
       return false;
+    }
+    
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * Get a address
+     * 
+     * @param type $fields
+     * @param type $get
+     * @return type
+     * @throws Exception
+     */
+    public static function getAddress($fields = [], $get = 'get'){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+        );
+        foreach($fields as $field => $value){
+          $params[$field] = $value;
+        }
+
+        $result = civicrm_api('Address', $get, $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::getAddress, API Address ' . $get . ' is_error, ' . $result['error_message']);
+        }
+        return $result;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::getAddress, API Address ' . $get . ' catch, '.$ex->getMessage());
+      }
+    }
+    
+    /**
+     * BOSW1510437 insite - opschonen vge adressen
+     * Delete a address by id
+     * 
+     * @param type $id
+     * @return boolean
+     * @throws Exception
+     */
+    public static function deleteAddress($id){
+      try {
+        $params = array(
+          'version' => 3,
+          'sequential' => 1,
+          'id' => $id,
+        );
+        $result = civicrm_api('Address', 'delete', $params);
+        if(isset($result['is_error']) and 1 == $result['is_error']){
+          die('Error, CRM_Utils_DgwUtils::deleteAddress, API Address delete is_error, ' . $result['error_message']);
+        }
+        return true;
+
+      } catch (CiviCRM_API3_Exception $ex) {
+        throw new Exception('Error, CRM_Utils_DgwUtils::deleteAddress, API Address delete catch, '.$ex->getMessage());
+      }
+
+      return true;
     }
   
     /**
